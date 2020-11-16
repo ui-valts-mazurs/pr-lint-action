@@ -12,7 +12,7 @@ jobs:
   pr-lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: ui-valts-mazurs/pr-lint-action@test-002
+      - uses: ui-valts-mazurs/pr-lint-action@test/pr
         with:
           title-regex: "#[eE][xX]-[0-9]+"
           on-failed-regex-fail-action: false
