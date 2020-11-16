@@ -65,8 +65,8 @@ function isGitHubActionUser(review: any) {
   return review.user.login == "github-actions[bot]"
 }
 
-function findLastReview(reviews: Array<any>) {
-  return reviews.filter(isGitHubActionUser).pop()
+function isRequireChanges(review: any) {
+  return review.state == "CHANGES_REQUESTED"
 }
 
 async function dismissReview(pullRequest: {
@@ -80,16 +80,19 @@ async function dismissReview(pullRequest: {
     pull_number: pullRequest.number,
   });
 
-  const lastReview = findLastReview(reviews)
-  if (lastReview && lastReview.state != 'DISMISSED') {
-    void githubClient.pulls.dismissReview({
-      owner: pullRequest.owner,
-      repo: pullRequest.repo,
-      pull_number: pullRequest.number,
-      review_id: lastReview.id,
-      message: "All good!",
-    });
-  }
+  reviews.data.forEach((review) => {
+    console.log("Review: " + review.id + ", state: " + review.state);
+    if (isGitHubActionUser(review) && isRequireChanges(review)) {
+      console.log("Dismissing review: " + review.id + ", state: " + review.state);
+      void githubClient.pulls.dismissReview({
+        owner: pullRequest.owner,
+        repo: pullRequest.repo,
+        pull_number: pullRequest.number,
+        review_id: review.id,
+        message: "All good!",
+      });
+    }
+  });
 }
 
 run().catch((error) => {
