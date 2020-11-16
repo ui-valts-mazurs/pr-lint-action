@@ -81,9 +81,9 @@ async function dismissReview(pullRequest: {
   });
 
   reviews.data.forEach((review) => {
-    console.log("Review: " + review.id + ", state: " + review.state);
+    core.info("Review: " + review.id + ", state: " + review.state);
     if (isGitHubActionUser(review) && isRequireChanges(review)) {
-      console.log("Dismissing review: " + review.id + ", state: " + review.state);
+      core.info("Dismissing review: " + review.id + ", state: " + review.state);
       void githubClient.pulls.dismissReview({
         owner: pullRequest.owner,
         repo: pullRequest.repo,
