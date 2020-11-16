@@ -61,6 +61,14 @@ function createReview(
   });
 }
 
+function isGitHubActionUser(review: any) {
+  return review.user.login == "github-actions[bot]"
+}
+
+function isRequireChanges(review: any) {
+  return review.state == "CHANGES_REQUESTED"
+}
+
 async function dismissReview(pullRequest: {
   owner: string;
   repo: string;
@@ -73,7 +81,9 @@ async function dismissReview(pullRequest: {
   });
 
   reviews.data.forEach((review) => {
-    if (review.user.login == "github-actions[bot]") {
+    core.info("Review: " + review.id + ", state: " + review.state);
+    if (isGitHubActionUser(review) && isRequireChanges(review)) {
+      core.info("Dismissing review: " + review.id + ", state: " + review.state);
       void githubClient.pulls.dismissReview({
         owner: pullRequest.owner,
         repo: pullRequest.repo,
